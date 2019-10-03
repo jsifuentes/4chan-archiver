@@ -4,10 +4,7 @@
     "watch": true,
     "script": "bot.js",
     "sourceDir": "/home/ubuntu/chan-archiver/",
-    "logFile": "/home/ubuntu/chan-archiver/logs/forever.log",
-    "outFile": "/home/ubuntu/chan-archiver/logs/out.log",
-    "errFile": "/home/ubuntu/chan-archiver/logs/error.log",
     "args": [
-        "--watchIgnore 'logs/*'"
+        "--watchIgnore '{logs}/**'"
     ]
 }
