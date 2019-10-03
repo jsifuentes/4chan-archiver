@@ -1,0 +1,5 @@
+node_modules
+scrapes/
+logs/
+config.env.json
+proxy-server.pem

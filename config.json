@@ -1,0 +1,30 @@
+{
+    "elasticsearch_host": "127.0.0.1:9200",
+    "max_subscriptions_per_board": -1,
+    "max_threads_per_tick": 50,
+    "secs_between_thread_update": 10,
+    "aws": {
+        "access_key_id": "",
+        "access_key_secret": "",
+        "keypair_name": "",
+        "possible_regions": ["us-east-1", "us-west-1", "us-west-2"],
+        "ami_ids": {
+            "us-east-1": "ami-0011a423ee45e9996",
+            "us-east-2": "ami-07351bc694219168d",
+            "us-west-1": "ami-0aed51a0af27c72e2",
+            "us-west-2": "ami-05724b7f35f5da6ee"
+        },
+        "instance_type": "t3a.nano",
+        "security_groups": ["archive proxy server"]
+    },
+    "proxy": {
+        "username": "",
+        "password": "",
+        "min_servers": 5,
+        "max_servers": 20,
+        "max_servers_per_region": 8,
+        "max_age": 120,
+        "preferred_max_threads_per_proxy": 80,
+        "new_instance_cooldown_time": 10000
+    }
+}
