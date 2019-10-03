@@ -2,9 +2,7 @@
     "uid": "archiver",
     "append": true,
     "watch": true,
+    "watchIgnore": "{logs}/**",
     "script": "bot.js",
-    "sourceDir": "/home/ubuntu/chan-archiver/",
-    "args": [
-        "--watchIgnore '{logs}/**'"
-    ]
+    "sourceDir": "/home/ubuntu/chan-archiver/"
 }
