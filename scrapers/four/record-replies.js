@@ -22,7 +22,7 @@ module.exports = async function recordReplies (board, threadId, replies) {
         createdAtStore[key] = createdAtStore[key] || new Date();
 
         indexablePost.archive_meta = {
-            created_at: createdAtStore[key],
+            first_seen_at: createdAtStore[key],
             last_updated_at: new Date()
         };
 
