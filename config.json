@@ -26,5 +26,10 @@
         "max_age": 120,
         "preferred_max_threads_per_proxy": 80,
         "new_instance_cooldown_time": 10000
+    },
+    "scrapers": {
+        "4chan": {
+            "boards": ["b", "pol", "k", "x"]
+        }
     }
 }

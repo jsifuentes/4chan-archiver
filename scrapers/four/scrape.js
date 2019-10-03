@@ -27,6 +27,7 @@ function getMaxEfficientThreadsPerTick () {
 
 function getMaxThreadsPerTick () {
     const maxEfficient = getMaxEfficientThreadsPerTick();
+
     return maxThreadsPerTick > -1 ? Math.min(maxEfficient, maxThreadsPerTick) : maxEfficient;
 }
 
