@@ -3,12 +3,12 @@ const es                    = require('../../lib/elasticsearch');
 const logger                = require('../../lib/logger');
 const convertPostToIndex    = require('./convert-post-to-index');
 
-const createdAtExpireTime = 60 * 20 * 1000;
-var createdAtStore = {};
+const lastUpdatedExpireTime = 60 * 20 * 1000;
+var archiveMetaStore = {};
 
 setInterval(() => {
-    createdAtStore = _.pick(createdAtStore, (value, key) => {
-        return (new Date().getTime() - value.first_seen_at.getTime()) < createdAtExpireTime;
+    archiveMetaStore = _.pick(archiveMetaStore, (value, key) => {
+        return (new Date().getTime() - value.last_updated.getTime()) < lastUpdatedExpireTime;
     });
 }, 60 * 1000);
 
@@ -19,14 +19,13 @@ module.exports = async function recordReplies (board, threadId, replies) {
         const key = `${board}/${threadId}`;
         let indexablePost = convertPostToIndex(board, reply);
 
-        if (!createdAtStore[key]) {
-            createdAtStore[key] = { "first_seen_at": new Date() };
+        if (!archiveMetaStore[key]) {
+            archiveMetaStore[key] = { "first_seen_at": new Date() };
         }
 
-        indexablePost.archive_meta = {
-            first_seen_at: createdAtStore[key],
-            last_updated_at: new Date()
-        };
+        archiveMetaStore[key].last_updated_at = new Date();
+
+        indexablePost.archive_meta = archiveMetaStore[key];
 
         body.push({
             index: {
