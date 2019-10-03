@@ -3,14 +3,14 @@ const es                    = require('../../lib/elasticsearch');
 const logger                = require('../../lib/logger');
 const convertPostToIndex    = require('./convert-post-to-index');
 
-const createdAtExpireTime = 60 * 20;
+const createdAtExpireTime = 60 * 20 * 1000;
 var createdAtStore = {};
 
 setInterval(() => {
     createdAtStore = _.pick(createdAtStore, (value, key) => {
-        return (new Date().getTime() - value.getTime()) < createdAtExpireTime;
+        return (new Date().getTime() - value.first_seen_at.getTime()) < createdAtExpireTime;
     });
-}, (20 * 60));
+}, 60 * 1000);
 
 module.exports = async function recordReplies (board, threadId, replies) {
     var body = [];
