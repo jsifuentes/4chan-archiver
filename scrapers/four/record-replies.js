@@ -19,7 +19,9 @@ module.exports = async function recordReplies (board, threadId, replies) {
         const key = `${board}/${threadId}`;
         let indexablePost = convertPostToIndex(board, reply);
 
-        createdAtStore[key] = createdAtStore[key] || new Date();
+        if (!createdAtStore[key]) {
+            createdAtStore[key] = { "first_seen_at": new Date() };
+        }
 
         indexablePost.archive_meta = {
             first_seen_at: createdAtStore[key],
