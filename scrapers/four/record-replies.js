@@ -8,7 +8,7 @@ var archiveMetaStore = {};
 
 setInterval(() => {
     archiveMetaStore = _.pick(archiveMetaStore, (value, key) => {
-        return (new Date().getTime() - value.last_updated.getTime()) < lastUpdatedExpireTime;
+        return (new Date().getTime() - value.last_updated_at.getTime()) < lastUpdatedExpireTime;
     });
 }, 60 * 1000);
 
