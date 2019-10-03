@@ -3,11 +3,28 @@ const es                    = require('../../lib/elasticsearch');
 const logger                = require('../../lib/logger');
 const convertPostToIndex    = require('./convert-post-to-index');
 
+const createdAtExpireTime = 60 * 20;
+var createdAtStore = {};
+
+setInterval(() => {
+    createdAtStore = _.pick(createdAtStore, (value, key) => {
+        return (new Date().getTime() - value.getTime()) < createdAtExpireTime;
+    });
+}, (20 * 60));
+
 module.exports = async function recordReplies (board, threadId, replies) {
     var body = [];
 
     _.each(replies, function (reply) {
+        const key = `${board}/${threadId}`;
         let indexablePost = convertPostToIndex(board, reply);
+
+        createdAtStore[key] = createdAtStore[key] || new Date();
+
+        indexablePost.meta = {
+            created_at: createdAtStore[key],
+            last_updated_at: new Date()
+        };
 
         body.push({
             index: {
