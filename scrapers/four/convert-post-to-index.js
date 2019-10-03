@@ -22,6 +22,7 @@ module.exports = function convertPostToIndex (board, post) {
             md5: post.md5 || null,
             is_deleted: !!post.filedeleted
         },
+        posted_at: post.time * 1000,
         timestamp: post.time,
         timestamp_ms: post.tim,
         reply_to: post.resto,
