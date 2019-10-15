@@ -11,7 +11,7 @@ module.exports = async function waitForRunningInstances (min) {
 
     while (!conditionsMet) {
         await refreshInstances();
-        conditionsMet = Instances.getRunningInstances().length > min;
+        conditionsMet = Instances.getReadyInstances().length > min;
 
         logger.silly(`Waiting another 2 seconds before checking for running instances...`);
         await sleep(2000);

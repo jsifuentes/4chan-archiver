@@ -10,9 +10,7 @@ const newInstanceCoolDownTime = config.proxy.new_instance_cooldown_time || 5000;
 var Instances = {};
 var InstancesMeta = {};
 var ScheduledForRemoval = [];
-var TooNewToUse = [];
-
-// setInterval(() => { console.log(InstancesMeta) }, 1000);
+var ReadyToUse = [];
 
 function setInstances(instances, markAsNew) {
     const oldInstances = Instances;
@@ -33,16 +31,11 @@ function setInstances(instances, markAsNew) {
             }
 
             createInstanceMeta(instance.InstanceId);
-        });
 
-        if (markAsNew) {
-            setTimeout(() => {
-                _.each(newInstances, (instance) => {
-                    logger.info(`${instance.InstanceId} is now available to proxy`, TooNewToUse);
-                    delete TooNewToUse[instance.InstanceId];
-                })
-            }, newInstanceCoolDownTime);
-        }
+            if (!markAsNew) {
+                ReadyToUse[instance.InstanceId] = true;
+            }
+        });
     }
 
     const deletedInstances = _.filter(oldRunningInstances, (instance) => !_.findWhere(currentRunningInstances, { InstanceId: instance.InstanceId }));
@@ -62,7 +55,6 @@ function scheduleForRemoval (instanceId, region) {
     ScheduledForRemoval.push({ InstanceId: instanceId, Region: region });
 
     return new Promise(async (resolve, reject) => {
-        console.log(instanceId, getInstanceMeta(instanceId));
         while ((meta = getInstanceMeta(instanceId)) && meta.active_requests > 0) {
             logger.info(`${instanceId} still has ${meta.active_requests} active requsts. Cannot terminate yet.`);
             await sleep(1000);
@@ -72,15 +64,26 @@ function scheduleForRemoval (instanceId, region) {
     });
 }
 
+function isReadyToUse(instanceId, isReady) {
+    if (isReady === undefined) {
+        return !!ReadyToUse[instanceId];
+    }
+
+    ReadyToUse[instanceId] = !!isReady;
+    return !!isReady;
+}
+
 const addInstance = (instance) => setInstances(Instances.concat(instance));
 const removeInstance = (instanceId) => setInstances(_.filter(Instances, (instance) => instance.InstanceId !== instanceId));
-const getInstanceStatus = (instance) => `${instance.PublicIpAddress} (${instance.Region}) (${instance.State.Name})`;
+const getInstanceStatus = (instance) => `${instance.PublicIpAddress} (${instance.Region}) (${ReadyToUse[instance.InstanceId] ? 'ready' : instance.State.Name}) (${getInstanceMetaKey(instance.InstanceId, 'active_requests') || 0})`;
 const isScheduledForRemoval = (instanceId) => _.findWhere(ScheduledForRemoval, { InstanceId: instanceId }) !== undefined;
-const isTooNewToUse = (instanceId) => !!TooNewToUse[instanceId];
+const getNotReadyInstances = () => _.filter(getRunningInstances(), (instance) => !ReadyToUse[instance.InstanceId]);
 const getRunningInstances = () => _.filter(Instances, (instance) => instance.State.Name === "running");
+const getReadyInstances = () => _.filter(getRunningInstances(), (instance) => !isScheduledForRemoval(instance.InstanceId) && isReadyToUse(instance.InstanceId));
 const getPendingInstances = () => _.filter(Instances, (instance) => instance.State.Name === "pending");
 const createInstanceMeta = () => ({ active_requests: 0 })
 const getInstanceMeta = (instanceId) => InstancesMeta[instanceId] || createInstanceMeta();
+const getInstanceMetaKey = (instanceId, key) => getInstanceMeta(instanceId)[key];
 const setInstanceMetaKey = (instanceId, key, value) => {
     let instanceMeta = getInstanceMeta(instanceId);
     instanceMeta[key] = value;
@@ -105,9 +108,11 @@ module.exports = {
     removeInstance: removeInstance,
     scheduleForRemoval: scheduleForRemoval,
     isScheduledForRemoval: isScheduledForRemoval,
-    isTooNewToUse: isTooNewToUse,
+    isReadyToUse: isReadyToUse,
+    getNotReadyInstances: getNotReadyInstances,
     getRunningInstances: getRunningInstances,
     getPendingInstances: getPendingInstances,
+    getReadyInstances: getReadyInstances,
     getInstanceStatus: getInstanceStatus,
     getInstanceMeta: getInstanceMeta,
     setInstanceMetaKey: setInstanceMetaKey,

@@ -43,6 +43,6 @@ module.exports = async function recordReplies (board, threadId, replies) {
         });
     } catch (e) {
         logger.error(`Failed to bulk record replies for ${board}/${threadId}`);
-        logger.error(e);
+        console.log(e);
     }
 };

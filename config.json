@@ -20,6 +20,7 @@
     "proxy": {
         "username": "",
         "password": "",
+        "port": "8080",
         "min_servers": 5,
         "max_servers": 20,
         "max_servers_per_region": 8,

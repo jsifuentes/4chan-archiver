@@ -52,7 +52,7 @@ async function getArchiveThreads (boards) {
                 logger.silly(`Saved ${board}/${threadId} from the archive.`);
             } catch (e) {
                 logger.error(`Could not save thread ${threadId} from archive.`);
-                logger.error(e);
+                console.log(e);
             }
         });
     })
@@ -112,17 +112,17 @@ async function updateThread (currentTick, board, threadId, meta) {
             });
         }
     } catch (e) {
-        if (e.response && e.response.status === 404) {
+        if (e.statusCode === 404) {
             // Remove from subscriptions list.
             delete subscriptionList[board][threadId];
             logger.debug(`Removed ${threadId} from subscription list because it threw a 404.`);
-        } else if (e.response && e.response.status === 304) {
+        } else if (e.statusCode === 304) {
             logger.silly(`No changes to ${board}/${threadId} since last modified at ${lastModifiedAt}`);
         } else {
             // So it force fetches next tick
             subscriptionList[board][threadId].last_fetched_at = new Date(1970, 1, 1);
             logger.error(`Failed to fetch replies for ${board}/${threadId}`);
-            logger.error(e);
+            console.log(e);
         }
     }
 }

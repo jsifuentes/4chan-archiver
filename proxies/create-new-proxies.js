@@ -1,9 +1,10 @@
-const _                 = require('underscore');
-const AWS               = require('aws-sdk');
-const ConfigManager     = require('../lib/config-manager');
-const logger            = require('../lib/logger');
-const Instances         = require('./instances');
-const findBestRegion    = require('./find-best-region');
+const _                     = require('underscore');
+const AWS                   = require('aws-sdk');
+const ConfigManager         = require('../lib/config-manager');
+const logger                = require('../lib/logger');
+const Instances             = require('./instances');
+const findBestRegion        = require('./find-best-region');
+const getRequestInstance    = require('../lib/get-request-instance');
 
 const config                = ConfigManager.get();
 const awsAmiIds             = config.aws.ami_ids;
@@ -35,7 +36,7 @@ async function createNewServer (region) {
                     },
                     {
                         Key: 'Name',
-                        Value: 'archiver-proxy'
+                        Value: (process.env.NODE_ENV || 'production') + '-archiver-proxy'
                     }
                 ]
             }
@@ -45,6 +46,27 @@ async function createNewServer (region) {
     logger.debug(`Creating instance in ${region}`, instanceParams);
     return new AWS.EC2({apiVersion: '2016-11-15'}).runInstances(instanceParams).promise();
 }
+
+function checkForReadyProxies () {
+    let instances = Instances.getNotReadyInstances();
+
+    if (instances.length < 1) {
+        return;
+    }
+
+    _.each(instances, async (instance) => {
+        try {
+            const request = getRequestInstance();
+            await request.get('https://www.google.com/');
+            Instances.isReadyToUse(instance.InstanceId, true);
+            logger.info(`${instance.InstanceId} is ready to use as a proxy.`);
+        } catch (e) {
+            logger.debug(`${instance.InstanceId} is still not ready. ${e.message}`);
+        }
+    });
+}
+
+setInterval(checkForReadyProxies, 1000);
 
 module.exports = async function createNewProxies (number) {
     number = number || 1;

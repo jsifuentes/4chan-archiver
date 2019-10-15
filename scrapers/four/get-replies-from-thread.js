@@ -1,20 +1,25 @@
-const _                 = require('underscore');
-const getAxiosInstance  = require('../../lib/get-axios-instance');
-const logger            = require('../../lib/logger');
+const _                     = require('underscore');
+const getRequestInstance    = require('../../lib/get-request-instance');
+const logger                = require('../../lib/logger');
 
 module.exports = async function getRepliesFromThread (board, threadId, lastModified) {
     logger.silly(`Fetching all replies from ${board}/${threadId}`);
 
-    const config = lastModified ? {
-        headers: {
-            'If-Modified-Since': lastModified
-        }
-    } : undefined;
+    const config = {
+        url: `http://a.4cdn.org/${board}/thread/${threadId}.json`,
+        resolveWithFullResponse: true
+    };
 
-    const response = await getAxiosInstance().get(`http://a.4cdn.org/${board}/thread/${threadId}.json`, config);
+    if (lastModified) {
+        config.headers = {
+            'If-Modified-Since': lastModified
+        };
+    }
+
+    const response = await getRequestInstance().get(config);
 
     return {
-        replies: response.data.posts || [],
+        replies: response.body.posts || [],
         lastModified: response.headers['last-modified'] || null
     };
 }

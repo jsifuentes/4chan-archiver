@@ -12,6 +12,7 @@ const maxProxyAge                   = config.proxy.max_age || 1800;
 const minProxyServers               = config.proxy.min_servers || 3;
 const maxProxyServers               = config.proxy.max_servers || 3;
 const preferredMaxThreadsPerProxy   = config.proxy.preferred_max_threads_per_proxy || 50;
+const refreshInstancesInterval      = 30; // secs
 
 function getOutdatedProxies () {
     const instances = Instances.getInstances();
@@ -19,32 +20,10 @@ function getOutdatedProxies () {
     return _.filter(instances, hasExpired);
 }
 
-function needMoreProxies () {
-    const instancesCount = Instances.getInstances().length;
-    let serversToBoot = Math.max(0, minProxyServers - Instances.getInstances().length);
-    const newInstanceCount = () => instancesCount + serversToBoot;
-
-    if (serversToBoot > 0) {
-        logger.debug(`Need ${serversToBoot} new servers to reach minimum proxy servers of ${minProxyServers}`);
-    }
-
-    if (maxProxyServers === newInstanceCount()) {
-        logger.silly(`Reached max amount of proxies (${maxProxyAge})`);
-        return serversToBoot;
-    }
-
-    const subscriptionsCount = Subscriptions.count();
-    const threadsPerProxy = subscriptionsCount / instancesCount;
-
-    logger.silly(`Current threads per proxy: ${threadsPerProxy}. Preferred max: ${preferredMaxThreadsPerProxy}`);
-
-    return serversToBoot;
-}
-
 var tick = 0;
 
-const shouldExpediteRefresh = () => Instances.getInstances().length > Instances.getRunningInstances().length;
-const canRefresh = () => shouldExpediteRefresh() || tick % 15 === 0;
+const shouldExpediteRefresh = () => Instances.getInstances().length > Instances.getReadyInstances().length;
+const canRefresh = () => shouldExpediteRefresh() || tick % (refreshInstancesInterval / 2) === 0;
 
 async function refreshInstances () {
     if (!canRefresh()) {
@@ -95,7 +74,7 @@ async function refreshInstances () {
         }
     }
 
-    logger.info(`Current proxies: ${_.map(Instances.getInstances(), Instances.getInstanceMeta).join(', ')}`);
+    logger.info(`Current proxies: ${_.map(Instances.getInstances(), Instances.getInstanceStatus).join(', ')}`);
     return Instances.getInstances();
 }
 

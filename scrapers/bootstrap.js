@@ -11,7 +11,7 @@ module.exports = async function scraper () {
         await es.createIndexes(es.client);
     } catch (e) {
         logger.error('Cannot connect to Elasticsearch');
-        logger.error(e);
+        console.log(e);
         return;
     }
 

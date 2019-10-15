@@ -36,7 +36,7 @@ async function getEC2InstancesByRegion(region) {
         }
     } catch (e) {
         logger.error(`Could not fetch instances from EC2 for ${region}`);
-        logger.error(e);
+        console.log(e);
     }
 
     return instances;

@@ -1,5 +1,5 @@
-const _  = require('underscore');
-const es = require('../../lib/elasticsearch');
+const _     = require('underscore');
+const es    = require('../../lib/elasticsearch');
 
 module.exports = async function getUnindexedThreadIds (threadIds) {
     let results = await es.client.search({

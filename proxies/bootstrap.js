@@ -22,13 +22,13 @@ AWS.config.update({
 module.exports = async function bootstrapProxies () {
     let currentInstances = await refreshInstances();
 
-    if (Instances.getRunningInstances().length === 0) {
-        logger.info(`Pausing bootstrapping until at least one running proxy found...`);
+    if (Instances.getReadyInstances().length === 0) {
+        logger.info(`Pausing bootstrapping until at least one ready proxy found...`);
         await waitForRunningInstances(1);
         await sleep(5000);
     }
 
-    currentInstances = Instances.getRunningInstances();
+    currentInstances = Instances.getReadyInstances();
     setInterval(refreshInstances, 2000);
 
     return currentInstances;
