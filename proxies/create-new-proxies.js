@@ -30,6 +30,10 @@ async function createNewServer (region) {
                         Value: 'archiver-proxy-server'
                     },
                     {
+                        Key: 'Environment',
+                        Value: process.env.NODE_ENV || 'production'
+                    },
+                    {
                         Key: 'Name',
                         Value: 'archiver-proxy'
                     }

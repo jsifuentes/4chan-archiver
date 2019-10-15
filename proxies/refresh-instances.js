@@ -95,6 +95,7 @@ async function refreshInstances () {
         }
     }
 
+    logger.info(`Current proxies: ${_.map(Instances.getInstances(), Instances.getInstanceMeta).join(', ')}`);
     return Instances.getInstances();
 }
 

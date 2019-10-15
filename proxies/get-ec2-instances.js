@@ -19,6 +19,10 @@ async function getEC2InstancesByRegion(region) {
                     Values: ['archiver-proxy-server']
                 },
                 {
+                    Name: 'tag:Environment',
+                    Values: [process.env.NODE_ENV || 'production']
+                },
+                {
                     Name: 'instance-state-name',
                     Values: ['running', 'pending']
                 }
