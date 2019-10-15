@@ -56,7 +56,7 @@ function checkForReadyProxies () {
 
     _.each(instances, async (instance) => {
         try {
-            const request = getRequestInstance();
+            const request = getRequestInstance(instance);
             await request.get('https://www.google.com/');
             Instances.isReadyToUse(instance.InstanceId, true);
             logger.info(`${instance.InstanceId} is ready to use as a proxy.`);

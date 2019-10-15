@@ -36,7 +36,7 @@ async function refreshInstances () {
     logger.debug(`Refreshing EC2 Instances...`);
 
     // Get the current list of instances
-    Instances.setInstances(await getEC2Instances(), false);
+    Instances.setInstances(await getEC2Instances(), tick > 1);
 
     // Terminate the outdated proxies
     const outdatedProxies = getOutdatedProxies();

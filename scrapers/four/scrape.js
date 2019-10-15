@@ -6,6 +6,7 @@ const getRepliesFromThread      = require('./get-replies-from-thread');
 const recordReplies             = require('./record-replies');
 const getUnindexedThreadIds     = require('./get-unindexed-thread-ids');
 const ConfigManager             = require('../../lib/config-manager');
+const getRequestInstance        = require('../../lib/get-request-instance');
 
 const config = ConfigManager.get();
 const tickInterval = 500;
@@ -95,7 +96,7 @@ async function updateThread (currentTick, board, threadId, meta) {
     const differenceSinceLastFetched = Math.floor((new Date().getTime() - lastFetchedAt.getTime()) / 1000);
     const subscriptionList = Subscriptions.getSubscriptions();
 
-    logger.debug(`#${currentTick} Updating ${board}/${threadId} (${differenceSinceLastFetched} sec. since last fetched)`);
+    logger.silly(`#${currentTick} Updating ${board}/${threadId} (${differenceSinceLastFetched} sec. since last fetched)`);
 
     subscriptionList[board][threadId] = subscriptionList[board][threadId] || {};
 
@@ -128,6 +129,15 @@ async function updateThread (currentTick, board, threadId, meta) {
 }
 
 async function processTick (currentTick) {
+    try {
+        getRequestInstance();
+    } catch (e) {
+        if (currentTick % 30) {
+            logger.info(`Failed to get a proper request instance. Not processing anymore ticks...`);
+        }
+        return;
+    }
+
     /**
      * Update the subscription list every 30 seconds.
      * This will allow us to update the subscription list before

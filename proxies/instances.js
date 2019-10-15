@@ -26,10 +26,6 @@ function setInstances(instances, markAsNew) {
         logger.info(`Proxy Servers: New Servers - ${_.map(newInstances, getInstanceStatus).join(', ')}`);
 
         _.each(newInstances, (instance) => {
-            if (markAsNew) {
-                TooNewToUse[instance.InstanceId] = true;
-            }
-
             createInstanceMeta(instance.InstanceId);
 
             if (!markAsNew) {
@@ -45,6 +41,7 @@ function setInstances(instances, markAsNew) {
 
         _.each(newInstances, (instance) => {
             delete InstancesMeta[instance.InstanceId];
+            delete ReadyToUse[instance.InstanceId];
         });
     }
 
@@ -55,6 +52,7 @@ function scheduleForRemoval (instanceId, region) {
     ScheduledForRemoval.push({ InstanceId: instanceId, Region: region });
 
     return new Promise(async (resolve, reject) => {
+        console.log(instanceId, getInstanceMeta(instanceId));
         while ((meta = getInstanceMeta(instanceId)) && meta.active_requests > 0) {
             logger.info(`${instanceId} still has ${meta.active_requests} active requsts. Cannot terminate yet.`);
             await sleep(1000);
@@ -68,6 +66,8 @@ function isReadyToUse(instanceId, isReady) {
     if (isReady === undefined) {
         return !!ReadyToUse[instanceId];
     }
+
+    console.log(instanceId, ReadyToUse);
 
     ReadyToUse[instanceId] = !!isReady;
     return !!isReady;
