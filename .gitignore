@@ -3,3 +3,4 @@ scrapes/
 logs/
 config.env.json
 proxy-server.pem
+cache.json

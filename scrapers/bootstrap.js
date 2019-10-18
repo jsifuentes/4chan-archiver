@@ -8,7 +8,7 @@ const config = ConfigManager.get();
 module.exports = async function scraper () { 
     try {
         await es.client.ping();
-        await es.createIndexes(es.client);
+        await es.syncIndexes(es.client);
     } catch (e) {
         logger.error('Cannot connect to Elasticsearch');
         console.log(e);
