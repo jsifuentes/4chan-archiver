@@ -22,7 +22,7 @@ function transformPost (post) {
     archiveMetaStore[key].last_updated_at = new Date();
 
     post.archive_meta = archiveMetaStore[key];
-    post.clean_html = dehtmlify(post.body);
+    post.clean_body = dehtmlify(post.body);
     return post;
 }
 
