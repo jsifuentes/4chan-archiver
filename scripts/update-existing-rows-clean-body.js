@@ -50,13 +50,15 @@ async function bootstrap () {
 
     let hasPosts = true;
     // get list of posts that do not have a clean body
+    let i = 0;
     while (hasPosts) {
         let result = await getNextPosts();
 
         if (result.hits.hits.length > 0) {
             // cool
             // bulk update now
-            console.log(await bulkUpdatePosts(result.hits.hits));
+            await bulkUpdatePosts(result.hits.hits);
+            console.log(++i + 'round completed');
         } else {
             hasPosts = false;
         }
