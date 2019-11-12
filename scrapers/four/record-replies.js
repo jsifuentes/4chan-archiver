@@ -35,7 +35,7 @@ module.exports = async function recordReplies (board, threadId, replies) {
 
         body.push({
             index: {
-                _index: 'posts',
+                _index: 'posts_alias',
                 _id: indexablePost._id
             }
         });

@@ -3,7 +3,7 @@ const es    = require('../../lib/elasticsearch');
 
 module.exports = async function getUnindexedThreadIds (threadIds) {
     let results = await es.client.search({
-        index: 'posts',
+        index: 'posts_alias',
         body: {
             "query": {
                 "terms": {
