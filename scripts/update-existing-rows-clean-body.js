@@ -58,7 +58,7 @@ async function bootstrap () {
             // cool
             // bulk update now
             await bulkUpdatePosts(result.hits.hits);
-            console.log(++i + 'round completed');
+            console.log(++i + ' round completed');
         } else {
             hasPosts = false;
         }
