@@ -33,8 +33,6 @@ module.exports = async function recordReplies (board, threadId, replies) {
         let indexablePost = convertPostToIndex(board, reply);
         indexablePost = transformPost(indexablePost);
 
-        // console.log(indexablePost);
-
         body.push({
             index: {
                 _index: 'posts',
