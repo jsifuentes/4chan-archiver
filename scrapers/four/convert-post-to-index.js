@@ -1,6 +1,6 @@
 module.exports = function convertPostToIndex (board, post) {
     return {
-        _id: post.board + "/" + post.no,
+        _id: board + "/" + post.no,
         board: board,
         author: {
             name: post.name || "",
