@@ -3,8 +3,9 @@ const es                    = require('../../lib/elasticsearch');
 const logger                = require('../../lib/logger');
 const convertPostToIndex    = require('./convert-post-to-index');
 const dehtmlify             = require('../../lib/dehtmlify');
+const doesPostMatch         = require('../../triggers/does-post-match');
 
-const lastUpdatedExpireTime = 60 * 20 * 1000;
+const lastUpdatedExpireTime = 120 * 60 * 1000;
 var archiveMetaStore = {};
 
 setInterval(() => {
@@ -15,14 +16,27 @@ setInterval(() => {
 
 function transformPost (post) {
     let key = `${post.board}/${post._id}`;
-    if (!archiveMetaStore[key]) {
-        archiveMetaStore[key] = { "first_seen_at": new Date() };
-    }
-
-    archiveMetaStore[key].last_updated_at = new Date();
 
     post.archive_meta = archiveMetaStore[key];
     post.clean_body = dehtmlify(post.body);
+
+    if (!archiveMetaStore[key]) {
+        archiveMetaStore[key] = { "first_seen_at": new Date() };
+
+        let result = doesPostMatch(post);
+
+        if (result.matched) {
+            logger.verbose(`Alerted on ${post.board}/${post._id}`, result);
+            post.alerted_meta = {
+                matches: true,
+                keywords: result.matched_against,
+                groups: result.matched_groups,
+                comment: 'Automatic detection'
+            };
+        }
+    }
+
+    archiveMetaStore[key].last_updated_at = new Date();
     return post;
 }
 

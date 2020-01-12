@@ -5,7 +5,8 @@
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start-dev": "NODE_ENV=dev LOG_LEVEL=debug node bot.js"
+    "start-dev": "NODE_ENV=dev LOG_LEVEL=debug node bot.js",
+    "start-no-proxies": "NO_PROXIES=true LOG_LEVEL=debug NODE_ENV=dev node bot.js"
   },
   "author": "",
   "license": "ISC",

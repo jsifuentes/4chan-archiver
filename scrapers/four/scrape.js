@@ -122,7 +122,7 @@ async function updateThread (currentTick, board, threadId, meta) {
         } else {
             // So it force fetches next tick
             subscriptionList[board][threadId].last_fetched_at = new Date(1970, 1, 1);
-            logger.error(`Failed to fetch replies for ${board}/${threadId}`);
+            logger.warn(`Failed to fetch replies for ${board}/${threadId}. Will re-attempt.`);
             console.log(e);
         }
     }
