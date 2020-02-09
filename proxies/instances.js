@@ -64,7 +64,7 @@ function scheduleForRemoval (instanceId, region) {
 
 function isReadyToUse(instanceId, isReady) {
     if (isReady === undefined) {
-        return !!ReadyToUse[instanceId];
+        return !!ReadyToUse[instanceId] && !this.getInstanceMetaKey(instanceId, 'force_remove');
     }
 
     console.log(instanceId, ReadyToUse);
@@ -101,6 +101,20 @@ const decrementActiveRequests = (instanceId) => {
     return setInstanceMetaKey(instanceId, 'active_requests', (instanceMeta['active_requests'] || 1) - 1);
 };
 
+const incrementTimeouts = (instanceId) => {
+    let instanceMeta = getInstanceMeta(instanceId);
+    let newVal = (instanceMeta['timeouts'] || 0) + 1;
+    let result = setInstanceMetaKey(instanceId, 'timeouts', newVal);
+
+    if (newVal >= 5) {
+        logger.info(`Scheduling ${intanceId} for removal due to multiple timeouts.`);
+        this.forceRemove(instanceId);
+    }
+}
+
+const resetTimeouts = (instanceId) => setInstanceMetaKey(instanceId, 'timeouts', 0);
+const forceRemove = (instanceId) => setInstanceMetaKey(instanceId, 'force_remove', 1);
+
 module.exports = {
     getInstances: () => Instances,
     setInstances: setInstances,
@@ -115,7 +129,11 @@ module.exports = {
     getReadyInstances: getReadyInstances,
     getInstanceStatus: getInstanceStatus,
     getInstanceMeta: getInstanceMeta,
+    getInstanceMetaKey: getInstanceMetaKey,
     setInstanceMetaKey: setInstanceMetaKey,
     incrementActiveRequests: incrementActiveRequests,
-    decrementActiveRequests: decrementActiveRequests
+    decrementActiveRequests: decrementActiveRequests,
+    incrementTimeouts: incrementTimeouts,
+    resetTimeouts: resetTimeouts,
+    forceRemove: forceRemove
 };

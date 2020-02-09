@@ -16,7 +16,7 @@ const refreshInstancesInterval      = 30; // secs
 
 function getOutdatedProxies () {
     const instances = Instances.getInstances();
-    const hasExpired = (instance) => ((new Date().getTime() - instance.LaunchTime.getTime())) / 1000 > maxProxyAge;
+    const hasExpired = (instance) => ((new Date().getTime() - instance.LaunchTime.getTime())) / 1000 > maxProxyAge || Instances.getInstanceMetaKey('force_remove');
     return _.filter(instances, hasExpired);
 }
 
