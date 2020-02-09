@@ -64,7 +64,7 @@ function scheduleForRemoval (instanceId, region) {
 
 function isReadyToUse(instanceId, isReady) {
     if (isReady === undefined) {
-        return !!ReadyToUse[instanceId] && !this.getInstanceMetaKey(instanceId, 'force_remove');
+        return !!ReadyToUse[instanceId] && !getInstanceMetaKey(instanceId, 'force_remove');
     }
 
     console.log(instanceId, ReadyToUse);
