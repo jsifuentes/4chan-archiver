@@ -2,8 +2,6 @@
 
 This project was a pet-project for a few months. This project stemmed from a conversation I had with a journalist who was interested in collecting *all* 4chan posts that occurred on a board. 
 
-The biggest problem I had when creating this was: How can you avoid getting IP banned by 4chan? To solve, I came up with this idea of using rotating proxies in AWS.
-
 This application will:
 
 * Automatically create EC2 servers based on pre-built AMI
