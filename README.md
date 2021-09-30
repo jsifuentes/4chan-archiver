@@ -1,6 +1,6 @@
 # chan-archiver
 
-This project was a pet-project for a few months. This project stemmed from a conversation I had with a journalist who was interested in collecting *all* 4chan posts that occurred on a board. 
+This project was a pet-project for a few months.
 
 This application will:
 
